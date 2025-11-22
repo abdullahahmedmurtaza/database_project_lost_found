@@ -1,0 +1,70 @@
+<h2>Submit a Claim</h2>
+
+<div id="itemBox">Loading item...</div>
+
+<form id="claimForm" enctype="multipart/form-data">
+    <textarea name="proof_text" placeholder="Describe why this item is yours"></textarea><br>
+    <input type="file" name="proof_image"><br><br>
+
+    <button type="submit">Submit Claim</button>
+</form>
+
+<script>
+// -----------------------------
+// Get item_id from URL
+// -----------------------------
+const params = new URLSearchParams(window.location.search);
+const item_id = params.get("item_id");
+
+// -----------------------------
+// Load item details
+// -----------------------------
+async function loadItem() {
+    let res = await fetch("/items");
+    let all = await res.json();
+
+    let item = all.find(i => i.id == item_id);
+
+    if (!item) {
+        document.getElementById("itemBox").innerHTML = "Item not found.";
+        return;
+    }
+
+    document.getElementById("itemBox").innerHTML = `
+        <h3>${item.item_name}</h3>
+        <p><b>Description:</b> ${item.description}</p>
+        <p><b>Location Found:</b> ${item.location_found}</p>
+    `;
+}
+
+loadItem();
+
+// -----------------------------
+// Submit Claim
+// -----------------------------
+document.getElementById("claimForm").onsubmit = async (e) => {
+    e.preventDefault();
+
+    let fd = new FormData();
+    fd.append("item_id", item_id);
+    fd.append("proof_text", e.target.proof_text.value);
+
+    if (e.target.proof_image.files.length > 0) {
+        fd.append("proof_image", e.target.proof_image.files[0]);
+    }
+
+    let res = await fetch("/claim", {
+        method: "POST",
+        body: fd
+    });
+
+    let data = await res.json();
+
+    if (data.success) {
+        alert("Claim submitted successfully!");
+        window.location.href = "/items.html";
+    } else {
+        alert("Error: " + JSON.stringify(data.error));
+    }
+};
+</script>

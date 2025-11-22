@@ -1,0 +1,46 @@
+<h2>Admin Dashboard</h2>
+<button onclick="junk()">Run Auto-Junk</button>
+<div id="claims"></div>
+
+<script>
+async function loadClaims() {
+    let res = await fetch("/admin/claims");
+    let claims = await res.json();
+
+    document.getElementById("claims").innerHTML =
+        claims.map(c => `
+            <div class='card'>
+                <b>${c.item_name}</b><br>
+                Claimed by: ${c.username}<br>
+                Proof: ${c.proof_text}<br>
+                <img src="/uploads/${c.proof_image}" width="100"><br>
+                <button onclick="app(${c.id}, ${c.item_id})">Approve</button>
+                <button onclick="rej(${c.id}, ${c.item_id})">Reject</button>
+            </div>
+        `).join("");
+}
+loadClaims();
+
+async function app(cid, iid) {
+    await fetch("/admin/approve", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ claim_id: cid, item_id: iid })
+    });
+    loadClaims();
+}
+
+async function rej(cid, iid) {
+    await fetch("/admin/reject", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ claim_id: cid, item_id: iid })
+    });
+    loadClaims();
+}
+
+async function junk() {
+    await fetch("/auto-junk");
+    alert("Junked expired items!");
+}
+</script>

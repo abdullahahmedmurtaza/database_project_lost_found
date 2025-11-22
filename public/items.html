@@ -1,0 +1,32 @@
+<h2>Available Items</h2>
+
+<div id="items"></div>
+
+<script>
+async function loadItems() {
+    let res = await fetch("/items");
+    let items = await res.json();
+
+    let cont = document.getElementById("items");
+    cont.innerHTML = "";
+
+    items.forEach(item => {
+        cont.innerHTML += `
+            <div style="border:1px solid #ccc; margin:10px; padding:10px;">
+                <h3>${item.item_name}</h3>
+                <p><b>Category:</b> ${item.category}</p>
+                <p><b>Description:</b> ${item.description}</p>
+                <p><b>Found at:</b> ${item.location_found}</p>
+
+                <button onclick="claim(${item.id})">Claim</button>
+            </div>
+        `;
+    });
+}
+
+function claim(id) {
+    window.location.href = "/claim.html?item_id=" + id;
+}
+
+loadItems();
+</script>

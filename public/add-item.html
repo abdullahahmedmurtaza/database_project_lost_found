@@ -1,0 +1,37 @@
+<h2>Add Found Item</h2>
+
+<form id="addForm">
+    <input name="item_name" placeholder="Item Name">
+    <select name="category">
+        <option>phone</option>
+        <option>laptop</option>
+        <option>keys</option>
+        <option>wallet_purse</option>
+        <option>charger</option>
+        <option>miscellaneous</option>
+    </select>
+    <textarea name="description" placeholder="Description"></textarea>
+    <input name="location_found" placeholder="Location Found">
+    <button>Add Item</button>
+</form>
+
+<script>
+document.getElementById("addForm").onsubmit = async (e) => {
+    e.preventDefault();
+
+    let data = {
+        item_name: e.target.item_name.value,
+        category: e.target.category.value,
+        description: e.target.description.value,
+        location_found: e.target.location_found.value
+    };
+
+    let res = await fetch("/add-item", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    alert("Item Added!");
+};
+</script>
