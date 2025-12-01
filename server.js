@@ -24,6 +24,9 @@ const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "GodofwarragnarokNovember2022",
+    // GodofwarragnarokNovember2022
+    //1234
+    
     database: "lostfound"
 });
 
