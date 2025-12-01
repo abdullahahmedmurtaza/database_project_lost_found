@@ -19,7 +19,7 @@ app.use(
     })
 );
 
-// MySQL connection
+//connector
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -32,7 +32,7 @@ db.connect(err => {
     else console.log("MySQL Connected!");
 });
 
-// Multer for proof image uploads
+//image uploads Multer
 const storage = multer.diskStorage({
     destination: "uploads/",
     filename: (req, file, cb) => {
@@ -42,9 +42,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// =========================
-// User Registration
-// =========================
+
+//register route
 app.post("/register", (req, res) => {
     const { username, password } = req.body;
 
@@ -58,9 +57,9 @@ app.post("/register", (req, res) => {
     );
 });
 
-// =========================
-// Login
-// =========================
+
+// login route
+
 app.post("/login", (req, res) => {
     const { username, password } = req.body;
 
@@ -82,9 +81,6 @@ app.post("/login", (req, res) => {
     );
 });
 
-// =========================
-// Add Found Item
-// =========================
 app.post("/add-item", (req, res) => {
 
     if (!req.session.user) {
@@ -105,19 +101,15 @@ app.post("/add-item", (req, res) => {
     );
 });
 
-// =========================
-// Get Items
-// =========================
+// for available items
+
 app.get("/items", (req, res) => {
     db.query("SELECT * FROM items WHERE status='listed'", (err, result) => {
         if (err) return res.json({ error: err });
         res.json(result);
     });
 });
-
-// =========================
-// Submit Claim
-// =========================
+        // claim form
 app.post("/claim", upload.single("proof_image"), (req, res) => {
     const { item_id, proof_text } = req.body;
     const user_id = req.session.user.id;
@@ -136,9 +128,7 @@ app.post("/claim", upload.single("proof_image"), (req, res) => {
     );
 });
 
-// =========================
-// Admin: View Claims
-// =========================
+//admin panel claims
 app.get("/admin/claims", (req, res) => {
     db.query(
         `SELECT claims.*, items.item_name, users.username 
@@ -153,9 +143,7 @@ app.get("/admin/claims", (req, res) => {
     );
 });
 
-// =========================
-// Admin: Approve Claim
-// =========================
+
 app.post("/admin/approve", (req, res) => {
     const { claim_id, item_id } = req.body;
 
@@ -165,9 +153,6 @@ app.post("/admin/approve", (req, res) => {
     res.json({ success: true });
 });
 
-// =========================
-// Admin: Reject Claim
-// =========================
 app.post("/admin/reject", (req, res) => {
     const { claim_id, item_id } = req.body;
 
@@ -177,9 +162,7 @@ app.post("/admin/reject", (req, res) => {
     res.json({ success: true });
 });
 
-// =========================
-// Auto Junk (Misc Only)
-// =========================
+//send to junk
 app.get("/auto-junk", (req, res) => {
     db.query(
         `UPDATE items
@@ -193,6 +176,7 @@ app.get("/auto-junk", (req, res) => {
         }
     );
 });
+//public me jo files hain wo statically send hongi, server change nahin krega.
 app.use(express.static("public"));
 app.use("/uploads", express.static("uploads"));
 app.listen(3000, () => console.log("Server running on 3000"));
